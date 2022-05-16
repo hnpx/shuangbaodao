@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.system.mapper.SysConfigLogisticsCompanyMapper">
+
+    <resultMap type="cn.px.sys.modular.system.entity.SysConfigLogisticsCompanyEntity" id="SysConfigLogisticsCompanyMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="apiUrl" column="api_url" jdbcType="VARCHAR"/>
+        <result property="token" column="token" jdbcType="VARCHAR"/>
+        <result property="appid" column="appid" jdbcType="VARCHAR"/>
+        <result property="logoUrl" column="logo_url" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <sql id="selectSysConfigLogisticsCompanyVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, name, code, api_url, token, appid, logo_url from sys_config_logistics_company
+    </sql>
+    
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM  sys_config_logistics_company
+        <where>
+                enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name = #{cm.name}
+            </if>
+            <if test="cm.code != null and cm.code != ''">
+                and code = #{cm.code}
+            </if>
+            <if test="cm.apiUrl != null and cm.apiUrl != ''">
+                and api_url = #{cm.apiUrl}
+            </if>
+            <if test="cm.token != null and cm.token != ''">
+                and token = #{cm.token}
+            </if>
+            <if test="cm.appid != null and cm.appid != ''">
+                and appid = #{cm.appid}
+            </if>
+            <if test="cm.logoUrl != null and cm.logoUrl != ''">
+                and logo_url = #{cm.logoUrl}
+            </if>
+        </where>
+    </select>
+</mapper>

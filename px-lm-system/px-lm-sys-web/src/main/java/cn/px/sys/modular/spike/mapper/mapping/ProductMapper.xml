@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.spike.mapper.ProductMapper">
+
+    <resultMap type="cn.px.sys.modular.spike.entity.ProductEntity" id="ProductMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="headFigure" column="head_figure" jdbcType="VARCHAR"/>
+        <result property="integral" column="integral" jdbcType="INTEGER"/>
+        <result property="remainingAmount" column="remaining_amount" jdbcType="INTEGER"/>
+        <result property="redeemedAmpunt" column="redeemed_ampunt" jdbcType="INTEGER"/>
+        <result property="exchangeNotice" column="exchange_notice" jdbcType="VARCHAR"/>
+        <result property="merchantId" column="merchant_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectProductVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, name, head_figure, integral, remaining_amount, redeemed_ampunt, exchange_notice, merchant_id from product
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM product
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name like CONCAT('%',#{cm.name},'%')
+            </if>
+            <if test="cm.headFigure != null and cm.headFigure != ''">
+                and head_figure = #{cm.headFigure}
+            </if>
+            <if test="cm.integral != null">
+                and integral = #{cm.integral}
+            </if>
+            <if test="cm.remainingAmount != null">
+                and remaining_amount = #{cm.remainingAmount}
+            </if>
+            <if test="cm.redeemedAmpunt != null">
+                and redeemed_ampunt = #{cm.redeemedAmpunt}
+            </if>
+            <if test="cm.exchangeNotice != null and cm.exchangeNotice != ''">
+                and exchange_notice = #{cm.exchangeNotice}
+            </if>
+            <if test="cm.merchantId != null">
+                and merchant_id = #{cm.merchantId}
+            </if>
+        </where>
+    </select>
+<!--    查询积分兑换列表/-->
+    <select id="pointsExchange" resultType="cn.px.sys.modular.spike.vo.ProductVO">
+        SELECT
+        *
+        FROM
+        product p
+        WHERE
+        p.id NOT IN (
+        SELECT
+        product_id
+        FROM
+        spike s
+        WHERE
+        s.ENABLE = 1
+        AND ( NOW()> s.strat_time AND NOW() &lt; s.end_time ))
+        AND p.`enable` =1
+    </select>
+
+    <select id="getPointsExchangeDetails" resultType="cn.px.sys.modular.spike.vo.PointsExchangeDetailsVO">
+        SELECT
+            p.head_figure,
+            p.NAME AS productName,
+            p.integral,
+            p.redeemed_ampunt,
+            p.remaining_amount,
+            p.exchange_notice
+        FROM
+           product p
+        WHERE
+            p.`enable` =1 and p.id=#{id}
+    </select>
+
+</mapper>

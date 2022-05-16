@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.project.mapper.ProjectCommentMapper">
+
+    <resultMap type="cn.px.sys.modular.project.entity.ProjectCommentEntity" id="ProjectCommentMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="projectId" column="project_id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="img" column="img" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="selectProjectCommentVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, project_id, user_id, content, img from project_comment
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM project_comment
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.projectId != null">
+                and project_id = #{cm.projectId}
+            </if>
+            <if test="cm.userId != null">
+                and user_id = #{cm.userId}
+            </if>
+            <if test="cm.content != null and cm.content != ''">
+                and content = #{cm.content}
+            </if>
+            <if test="cm.img != null and cm.img != ''">
+                and img = #{cm.img}
+            </if>
+        </where>
+    </select>
+
+    <select id="getCommentVoList" resultType="cn.px.sys.modular.activity.vo.CommentVo">
+
+    select pc.id,pc.user_id as "userId",pc.content,pc.img,au.avatar,au.nickname,DATE_FORMAT(pc.create_time,'%Y-%m-%d') as "createTime" from project_comment pc LEFT JOIN all_user au ON au.id = pc.user_id
+    where pc.enable = 1 and pc.project_id = #{projectId} ORDER BY pc.update_time DESC limit 0,3
+    </select>
+
+    <select id="getPageList" resultType="map">
+         select pc.id,pc.user_id as "userId",pc.content,pc.img,au.avatar,au.nickname,DATE_FORMAT(pc.create_time,'%Y-%m-%d') as "createTime" from project_comment pc LEFT JOIN all_user au ON au.id = pc.user_id
+    where pc.enable = 1 and pc.project_id = #{projectId}
+    </select>
+
+    <select id="getListByUser" resultType="cn.px.sys.modular.project.entity.ProjectCommentEntity">
+        <include refid="selectProjectCommentVo"/>
+        where user_id = #{userId}
+    </select>
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.homeClass.mapper.HomeClassMapper">
+
+    <resultMap type="cn.px.sys.modular.homeClass.entity.HomeClassEntity" id="HomeClassMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="communityId" column="community_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectHomeClassVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, name, community_id from home_class
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM home_class
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name  like CONCAT('%',#{cm.name},'%')
+            </if>
+            <if test="cm.communityId != null">
+                and community_id = #{cm.communityId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getHomeClass" resultType="map">
+        select hc.id,hc.name,cc.name as "cname",hc.sort from home_class hc LEFT JOIN community_class cc ON cc.id = hc.community_id
+        <where>
+            hc.enable = 1
+            <if test="name != null and name != ''">
+                and hc.name  like CONCAT('%',#{name},'%')
+            </if>
+            <if test="cname != null and cname != ''">
+                and cc.name  like CONCAT('%',#{cname},'%')
+            </if>
+            <if test="cid != null">
+                and hc.community_id = #{cid}
+            </if>
+        </where>
+        ORDER BY hc.sort
+    </select>
+
+    <select id="getHomeClassByCommunityId" resultType="cn.px.sys.modular.homeClass.entity.HomeClassEntity">
+        select id,name,community_id as "communityId" from home_class where enable = 1 and community_id = #{communityId}
+    </select>
+
+
+
+    <select id="HomeTotal" resultType="map">
+
+    SELECT (SELECT count(1)  from project where project.enable= 1 and project.status = 1) as projectSum ,
+        (SELECT count(1)  from activity WHERE activity.status = 1 and activity.enable = 1 ) as activitySum,
+        (SELECT count(1)    from all_user WHERE all_user.type is not null and all_user.enable = 1  ) as userSum,
+        (SELECT count(1)   from all_user WHERE all_user.type = 2 and all_user.enable = 1) as  partyMemberSum,
+        (SELECT count(1) from  unit WHERE unit.enable=1 and unit.user_id is not null) as organizationNum,
+        (SELECT SUM(IFNULL(all_user.remaining_points,0)) from all_user WHERE all_user.enable=1) as userIngralSum,
+        (SELECT COUNT(1) from merchant where enable = 1 and status = 1) as merchantNum,
+        (SELECT COUNT(1) from orders where enable = 1 and status = 1) as ordersNotExchangeNum,
+        (select IFNULL(SUM(integral),0) from integral_record where type =2) as consumption,
+        ( select IFNULL(SUM(integral),0) from integral_record where source = "商铺兑换") as merchantsIntegral
+
+
+    </select>
+
+
+</mapper>

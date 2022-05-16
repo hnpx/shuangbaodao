@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.virtualProject.mapper.VirtualProjectMapper">
+
+    <resultMap type="cn.px.sys.modular.virtualProject.entity.VirtualProjectEntity" id="VirtualProjectMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="companyClass" column="company_class" jdbcType="INTEGER"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="time" column="time" jdbcType="VARCHAR"/>
+        <result property="contactPerson" column="contact_person" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="belongingCommunity" column="belonging_community" jdbcType="INTEGER"/>
+        <result property="belongingUnit" column="belonging_unit" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectVirtualProjectVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, name, company_class, address, time, contact_person, phone, belonging_community, belonging_unit, status from virtual_project
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM virtual_project
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name = #{cm.name}
+            </if>
+            <if test="cm.companyClass != null">
+                and company_class = #{cm.companyClass}
+            </if>
+            <if test="cm.address != null and cm.address != ''">
+                and address = #{cm.address}
+            </if>
+            <if test="cm.time != null">
+                and time = #{cm.time}
+            </if>
+            <if test="cm.contactPerson != null and cm.contactPerson != ''">
+                and contact_person = #{cm.contactPerson}
+            </if>
+            <if test="cm.phone != null and cm.phone != ''">
+                and phone = #{cm.phone}
+            </if>
+            <if test="cm.belongingCommunity != null">
+                and belonging_community = #{cm.belongingCommunity}
+            </if>
+            <if test="cm.belongingUnit != null">
+                and belonging_unit = #{cm.belongingUnit}
+            </if>
+            <if test="cm.status != null">
+                and status = #{cm.status}
+            </if>
+        </where>
+    </select>
+
+    <select id="getList" resultType="map">
+        select id, name,company_class as "companyClass",belonging_community as "belongingCommunity",belonging_unit as "belongingUnit",address,
+        contact_person as "contactPerson",phone,time,status from virtual_project
+        <where>
+            enable = 1
+            <if test="name != null and name != ''">
+                and name like CONCAT('%',#{name},'%')
+            </if>
+            <if test="belongingCommunity != null">
+                and belonging_community = #{belongingCommunity}
+            </if>
+            <if test="belongingUnit != null">
+                and belonging_unit = #{belongingUnit}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="companyClass != null">
+                and company_class = #{companyClass}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getListExcel" resultType="cn.px.sys.modular.virtualProject.vo.VirtualProjectExcelVo">
+          select id, name,company_class as "companyClass",belonging_community as "belongingCommunity",belonging_unit as "belongingUnit",address,
+        contact_person as "contactPerson",phone,time,status from virtual_project
+        <where>
+            enable = 1
+            <if test="belongingCommunity != null">
+                and belonging_community = #{belongingCommunity}
+            </if>
+        </where>
+    </select>
+</mapper>

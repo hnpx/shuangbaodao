@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.activity.mapper.ActivityMapper">
+
+    <resultMap type="cn.px.sys.modular.activity.entity.ActivityEntity" id="ActivityMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="contactPerson" column="contact_person" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="introduction" column="introduction" jdbcType="VARCHAR"/>
+        <result property="integral" column="integral" jdbcType="INTEGER"/>
+        <result property="signIn" column="sign_in" jdbcType="INTEGER"/>
+        <result property="signQr" column="sign_qr" jdbcType="VARCHAR"/>
+        <result property="signoutQr" column="signout_qr" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="reason" column="reason" jdbcType="VARCHAR"/>
+        <result property="belongingCommunity" column="belonging_community" jdbcType="INTEGER"/>
+        <result property="belongingUnit" column="belonging_unit" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectActivityVo">
+        select id, enable, create_by as "createBy", create_time "createTime", update_by as "updateBy", update_time as "updateTime", remark, sort, name, address, start_time as "startTime", end_time as "endTime", contact_person as "contactPerson", phone, introduction, integral, sign_in as "signIn", sign_qr as "signQr", signout_qr as "signoutQr", status, reason,user_type as "userType",headFigure,belonging_community as "belongingCommunity",belonging_unit as "belongingUnit" from activity
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM activity
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name = #{cm.name}
+            </if>
+            <if test="cm.address != null and cm.address != ''">
+                and address = #{cm.address}
+            </if>
+            <if test="cm.startTime != null">
+                and start_time = #{cm.startTime}
+            </if>
+            <if test="cm.endTime != null">
+                and end_time = #{cm.endTime}
+            </if>
+            <if test="cm.contactPerson != null and cm.contactPerson != ''">
+                and contact_person = #{cm.contactPerson}
+            </if>
+            <if test="cm.phone != null and cm.phone != ''">
+                and phone = #{cm.phone}
+            </if>
+            <if test="cm.introduction != null and cm.introduction != ''">
+                and introduction = #{cm.introduction}
+            </if>
+            <if test="cm.integral != null">
+                and integral = #{cm.integral}
+            </if>
+            <if test="cm.signIn != null">
+                and sign_in = #{cm.signIn}
+            </if>
+            <if test="cm.signQr != null and cm.signQr != ''">
+                and sign_qr = #{cm.signQr}
+            </if>
+            <if test="cm.signoutQr != null and cm.signoutQr != ''">
+                and signout_qr = #{cm.signoutQr}
+            </if>
+            <if test="cm.status != null">
+                and status = #{cm.status}
+            </if>
+            <if test="cm.reason != null and cm.reason != ''">
+                and reason = #{cm.reason}
+            </if>
+            <if test="cm.belongingCommunity != null and cm.belongingCommunity != ''">
+                and belonging_community = #{cm.belongingCommunity}
+            </if>
+
+            <if test="cm.belongingUnit != null and cm.belongingUnit != ''">
+                and belonging_unit = #{cm.belongingUnit}
+            </if>
+        </where>
+        ORDER BY update_time DESC
+    </select>
+
+    <select id="getActivity" resultType="map">
+     <include refid="selectActivityVo"/>
+     <where>
+         enable = 1
+         <if test="status != null and status != ''">
+             and status = #{status}
+         </if>
+         <if test="name != null and name != ''">
+             and name like CONCAT('%',#{name},'%')
+         </if>
+         <if test="timeStatus == 1 ">
+             and #{date} &lt; start_time
+         </if>
+         <if test="timeStatus == 2 ">
+             and #{date}  between start_time and end_time
+         </if>
+         <if test="timeStatus == 3 ">
+             and #{date} &gt; end_time
+         </if>
+         <if test="cid != null">
+             and cid = #{cid}
+         </if>
+         <if test="contactPerson != null and contactPerson != ''">
+             and contact_person like CONCAT('%',#{contactPerson},'%')
+         </if>
+         <if test="phone != null and phone != ''">
+             and phone like CONCAT('%',#{phone},'%')
+         </if>
+
+     </where>
+     ORDER BY update_time DESC
+    </select>
+
+
+    <select id="getActivityWx" resultType="map">
+        <include refid="selectActivityVo"/>
+        <where>
+            enable = 1 and status = 1
+            <if test="timeStatus == 1">
+                and start_time &gt; #{date}
+            </if>
+            <if test="timeStatus == 2">
+              and  #{date}  between start_time and end_time
+            </if>
+            <if test="timeStatus == 3">
+                and end_time &lt; #{date}
+            </if>
+        </where>
+        ORDER BY update_time DESC
+    </select>
+
+    <select id="getActiveVo" resultType="cn.px.sys.modular.activity.vo.ActiveVo">
+        select id,name,headFigure,update_time as "createTime" from activity
+        where status = 1 and enable = 1
+          and(#{date}  between start_time and end_time
+            or #{date} &lt; start_time)
+        ORDER BY update_time DESC
+        Limit 0,4
+    </select>
+
+
+    <select id="getNote" resultType="map">
+        select
+        a.name as "name",a.reason,a.create_time as "createTime",'1' as type   from activity a where a.enable = 1 and a.create_by = #{userId} and a.status = 2  UNION ALL
+        select d.content as "name",d.reason,d.create_time as "createTime",'2'  as type  from demand d where d.enable = 1 and d.create_by = #{userId}  and d.status = 2  UNION ALL
+        select r.name,r.reason,r.create_time as "createTime",'3' as type  from resources r where r.enable = 1 and r.create_by = #{userId}  and r.status = 2 UNION ALL
+        select m.name,m.reason,m.create_time as "createTime",'4' as type  from merchant m where m.enable = 1 and m.create_by = #{userId}  and m.status = 2 UNION ALL
+        select p.name,p.reason,p.create_time as "createTime",'5' as type  from project p where p.enable = 1 and p.create_by = #{userId} and p.status = 2
+        ORDER BY createTime DESC
+    </select>
+
+    <select id="getNote1" resultType="map">
+        select
+        a.name as "name",a.reason,a.create_time as "createTime" ,'1' as type  from activity a where a.enable = 1 and a.status = 2 UNION ALL
+        select d.content as "name",d.reason,d.create_time as "createTime" ,'2' as type from demand d where d.enable = 1 and d.status = 2  UNION ALL
+        select r.name,r.reason,r.create_time as "createTime",'3' as type  from resources r where r.enable = 1 and r.status = 2  UNION ALL
+         select m.name,m.reason,m.create_time as "createTime",'4' as type  from merchant m where m.enable = 1 and m.status = 2  UNION ALL
+          select p.name,p.reason,p.create_time as "createTime",'5' as type  from project p where p.enable = 1 and p.create_by = #{userId} and p.status = 2
+        ORDER BY createTime DESC
+    </select>
+
+   <select id="getList" resultType="cn.px.sys.modular.activity.entity.ActivityEntity">
+       <include refid="selectActivityVo"/>
+        where enable = 1 and status = 1 and sign_in = 2 and NOW() &gt;= end_time
+   </select>
+
+    <select id="getApply" resultType="map">
+     select a.id,
+        a.name as "name",a.create_time as "createTime",'1' as type,a.create_by as "createBy"   from activity a
+        <where>
+            a.enable = 1 and a.status = 3
+            <if test="cid != null">
+                and a.cid = #{cid}
+            </if>
+        </where>
+        UNION ALL
+        select d.id, d.content as "name",d.create_time as "createTime",'2' as type,d.create_by as "createBy"  from demand d
+        <where>
+            d.enable = 1 and d.status = 3
+            <if test="cid != null">
+                and d.cid = #{cid}
+            </if>
+        </where>
+          UNION ALL
+        select r.id, r.name,r.create_time as "createTime" ,'3' as type,r.create_by as "createBy" from resources r
+        <where>
+            r.enable = 1 and r.status = 3
+            <if test="cid != null">
+                and r.cid = #{cid}
+            </if>
+        </where>
+        UNION ALL
+        select p.id,p.name,p.create_time as "createTime",'4' as type,p.create_by as "create_by" from project p
+        <where>
+            p.enable = 1 and p.status = 3
+            <if test="cid != null">
+                and p.belonging_community = #{cid}
+            </if>
+        </where>
+        ORDER BY createTime DESC
+    </select>
+
+</mapper>

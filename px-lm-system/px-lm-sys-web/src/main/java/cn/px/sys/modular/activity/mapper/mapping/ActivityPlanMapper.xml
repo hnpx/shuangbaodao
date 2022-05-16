@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.activity.mapper.ActivityPlanMapper">
+
+    <resultMap type="cn.px.sys.modular.activity.entity.ActivityPlanEntity" id="ActivityPlanMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="serviceTime" column="service_time" jdbcType="VARCHAR"/>
+        <result property="serviceContent" column="service_content" jdbcType="VARCHAR"/>
+        <result property="serviceDesc" column="service_desc" jdbcType="VARCHAR"/>
+        <result property="servieReserved" column="servie_reserved" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="selectActivityPlanVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, service_time, service_content, service_desc, servie_reserved from activity_plan
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM activity_plan
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.serviceTime != null and cm.serviceTime != ''">
+                and service_time = #{cm.serviceTime}
+            </if>
+            <if test="cm.serviceContent != null and cm.serviceContent != ''">
+                and service_content = #{cm.serviceContent}
+            </if>
+            <if test="cm.serviceDesc != null and cm.serviceDesc != ''">
+                and service_desc = #{cm.serviceDesc}
+            </if>
+            <if test="cm.servieReserved != null and cm.servieReserved != ''">
+                and servie_reserved = #{cm.servieReserved}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getlist" resultMap="ActivityPlanMap">
+       <include refid="selectActivityPlanVo"></include>
+       where create_by = #{uid}
+    </select>
+</mapper>

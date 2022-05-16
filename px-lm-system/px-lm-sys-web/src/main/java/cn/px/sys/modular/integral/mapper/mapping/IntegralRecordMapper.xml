@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.integral.mapper.IntegralRecordMapper">
+
+    <resultMap type="cn.px.sys.modular.integral.entity.IntegralRecordEntity" id="IntegralRecordMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="integral" column="integral" jdbcType="INTEGER"/>
+        <result property="source" column="source" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="selectIntegralRecordVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, user_id, integral, source from integral_record
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM integral_record
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.userId != null">
+                and user_id = #{cm.userId}
+            </if>
+            <if test="cm.integral != null">
+                and integral = #{cm.integral}
+            </if>
+            <if test="cm.source != null and cm.source != ''">
+                and source = #{cm.source}
+            </if>
+        </where>
+    </select>
+
+    <select id="getHomeList" resultType="map">
+     select id,create_time as "createTime", user_id as "userId", integral, source,type from integral_record
+     <where>
+         <if test="userId != null">
+             user_id = #{userId}
+         </if>
+     </where>
+     ORDER BY create_time DESC
+    </select>
+
+    <select id="getIntegralToday" resultType="int">
+        select sum(integral) from integral_record where user_id = #{userId} and type = 1 and to_days(create_time) = to_days(now());
+    </select>
+
+
+    <select id="FindIntergralList" resultType="map">
+       SELECT
+        integral.create_time as createTime,
+        integral.user_id as id ,
+        user.nickname as nickName,
+        integral.source,
+        integral.integral,
+        integral.type
+        from integral_record  integral
+        LEFT JOIN all_user user on  integral.user_id = user.id
+        where  user.type is not null
+        ORDER BY integral.create_time DESC
+    </select>
+
+
+    <select id="FindIntergralListByUser" resultType="map">
+
+    SELECT * from (
+                SELECT user.id,user.enable,user.avatar,user.remaining_points,user.nickname,user.type,@curRank := @curRank + 1 as rownum
+                    from all_user user,
+				(SELECT @curRank := 0 ) r
+				WHERE type is not null and enable = 1
+				ORDER BY remaining_points desc
+				) a
+
+    </select>
+
+
+    <select id="FindIntergralListByUserId" resultType="map">
+            SELECT * from (
+                SELECT user.id,user.enable,user.avatar,user.remaining_points,user.nickname,user.type,@curRank := @curRank + 1 as rownum
+                    from all_user user,
+				(SELECT @curRank := 0 ) r
+				where type is not null and enable = 1
+				ORDER BY remaining_points desc
+				) a
+				WHERE a.id = #{userId}
+    </select>
+
+
+
+    <select id="FindIntergralListByOrganization" resultType="map">
+        SELECT * from (
+                SELECT unit.id,unit.enable,unit.name as nickname,unit.integral,@curRank := @curRank + 1 as rownum
+                    from unit unit,
+				(SELECT @curRank := 0 ) r
+				where enable = 1 and is_unit =#{isUnit}
+				ORDER BY integral desc
+				) a
+
+
+
+    </select>
+
+    <select id="FindOrganizationIntergralListByUserId" resultType="map">
+         SELECT * from (
+                SELECT unit.id ,unit.name as nickname,unit.integral,@curRank := @curRank + 1 as rownum
+                    from unit unit,
+				(SELECT @curRank := 0 ) r
+				ORDER BY integral desc
+				) a
+				WHERE id = #{id}
+    </select>
+
+
+
+
+
+    <select id="FindIntergralListByCommunity" resultType="map">
+     SELECT * from (
+
+   SELECT integral,id,name,@curRank := @curRank + 1 as rownum,enable from  community_class ,
+
+   (SELECT @curRank := 0 ) r
+    where enable = 1
+   ORDER BY integral  desc
+   )a
+
+    </select>
+
+    <select id="FindCommunityByCommunityId" resultType="map">
+
+       SELECT * from (
+
+   SELECT integral,id,name,@curRank := @curRank + 1 as rownum from  community_class  ,
+
+   (SELECT @curRank := 0 ) r
+
+   ORDER BY integral  desc
+
+   )a
+   where id = #{id}
+
+    </select>
+
+
+        <select id="FindIntergralAVGListByCommunity" resultType="map">
+
+      SELECT
+	*
+        FROM
+	(
+	SELECT
+		@rowNo := @rowNo + 1 AS rownum,
+		a.*,
+		a.integral/a.sum as avgNum
+	FROM
+		(
+		SELECT
+		IFNULL(count(unit.id),0) as sum ,
+			unit.id ,
+			unit.integral,
+			unit.name,
+			unit.enable
+        from unit
+        LEFT JOIN member on unit.id = member.belonging_unit
+        LEFT JOIN report_cadre on unit.id = report_cadre.belonging_unit
+        where unit.enable= 1
+        GROUP BY unit.id
+		) a,
+		( SELECT @rowNo := 0 ) b
+	ORDER BY
+	a.integral DESC
+	) c
+
+
+    </select>
+
+    <select id="FindCommunityAVGByCommunityId" resultType="map">
+
+      SELECT
+	*
+        FROM
+	(
+	SELECT
+		@rowNo := @rowNo + 1 AS rownum,
+		a.*,
+		a.integral/a.sum as avgNum
+	FROM
+		(
+		SELECT
+		IFNULL(count(unit.id),0) as sum ,
+			unit.id ,
+			unit.integral,
+			unit.name,
+			unit.enable
+        from unit
+        LEFT JOIN member on unit.id = member.belonging_unit
+        LEFT JOIN report_cadre on unit.id = report_cadre.belonging_unit
+        where unit.enable= 1
+        GROUP BY unit.id
+		) a,
+		( SELECT @rowNo := 0 ) b
+	ORDER BY
+	a.integral DESC
+	) c
+
+
+	where  id = #{id}
+    </select>
+
+    <select id="getIntegral" resultType="int">
+        select IFNULL(SUM(integral),0) from integral_record where mid = #{mid} and source = "商铺兑换奖励积分"
+    </select>
+
+    <select id="getRecord" resultType="map">
+      select id,user_id as "userId", integral, source,create_time as "createTime" from integral_record
+      where enable = 1 and mid = #{mid}
+      order BY create_time DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT COUNT(1) from all_user where enable = 1 and type is not null
+    </select>
+    
+    <select id="getIntegralRecordByUserSource" resultType="cn.px.sys.modular.integral.entity.IntegralRecordEntity">
+        select * from integral_record where user_id = #{userId} and source = #{source} and integral =#{integral}  limit 0,1
+    </select>
+
+    <select id="getEntityByUser" resultType="cn.px.sys.modular.integral.entity.IntegralRecordEntity">
+         select * from integral_record where user_id = #{userId}
+    </select>
+
+    <select id="getconsumption" resultType="int">
+        select IFNULL(SUM(integral),0) from integral_record where type =2
+    </select>
+
+    <select id="getMerchantsIntegral" resultType="int">
+        select IFNULL(SUM(integral),0) from integral_record where source = "商铺兑换"
+    </select>
+
+    <select id="sumIntegral" resultType="int">
+        select IFNULL(SUM(integral),0) from integral_record
+       <where>
+           user_id = #{userId}
+         <if test="type != null">
+             and type = #{type}
+         </if>
+         <if test="year != null and year != ''">
+           and create_time  like CONCAT('%',#{year},'%')
+         </if>
+       </where>
+    </select>
+
+</mapper>

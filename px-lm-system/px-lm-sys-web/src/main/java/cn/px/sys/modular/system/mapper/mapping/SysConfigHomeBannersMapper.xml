@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.system.mapper.SysConfigHomeBannersMapper">
+
+    <resultMap type="cn.px.sys.modular.system.entity.SysConfigHomeBannersEntity" id="SysConfigHomeBannersMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="link" column="link" jdbcType="VARCHAR"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="title" column="title" jdbcType="VARCHAR"/>
+        <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+        <result property="info" column="info" jdbcType="VARCHAR"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+    
+    <sql id="selectSysConfigHomeBannersVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, link, sort, title, pic_url, info, end_time, status from sys_config_home_banners
+    </sql>
+    
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM  sys_config_home_banners
+        <where>
+                enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.link != null and cm.link != ''">
+                and link = #{cm.link}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.keyword != null and cm.keyword != ''">
+                and title like CONCAT('%',#{cm.keyword},'%')
+            </if>
+            <if test="cm.picUrl != null and cm.picUrl != ''">
+                and pic_url = #{cm.picUrl}
+            </if>
+            <if test="cm.info != null and cm.info != ''">
+                and info = #{cm.info}
+            </if>
+            <if test="cm.endTime != null">
+                and end_time = #{cm.endTime}
+            </if>
+            <if test="cm.status != null">
+                and status = #{cm.status}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+</mapper>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>if (window !== top) top.location.replace(location.href);</script>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="${ctxPath}/assets/expand/images/favicon.ico" rel="icon">
+    <title>登录 </title>
+    <link rel="stylesheet" href="${ctxPath}/assets/common/libs/layui/css/layui.css?v=${constants.getReleaseVersion()}"/>
+    <link rel="stylesheet" href="${ctxPath}/assets/common/module/admin.css?v=${constants.getReleaseVersion()}"/>
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="login-wrapper">
+    <div class="titles">
+            <img src="/assets/common/images/logo.png" alt="">
+            <h1>智慧沙河+公益互助银行+双报到</h1>
+    </div>
+    <div class="layui-form">
+        <h2>用户登录</h2>
+        @if(constants.getTenantOpen()){
+        <div class="layui-form-item layui-input-icon-group">
+            <i class="layui-icon layui-icon-username"></i>
+            <select name="tenantCode" id="tenantCode">
+                <option value="">默认租户</option>
+            </select>
+        </div>
+        @}
+        <div class="layui-form-item layui-input-icon-group">
+            <sapn class="layui-icon layui-icon-username1"></sapn>
+            <input class="layui-input" id="username" name="username" placeholder="请输入登录账号" value="" autocomplete="off" lay-verType="tips" lay-verify="required" required/>
+        </div>
+        <div class="layui-form-item layui-input-icon-group">
+            <span class="layui-icon layui-icon-password1"></span>
+            <input class="layui-input" id="password" name="password" placeholder="请输入登录密码" value="" type="password" lay-verType="tips" lay-verify="required" required/>
+        </div>
+        @if(constants.getKaptchaOpen()){
+        <div class="layui-form-item layui-input-icon-group login-captcha-group">
+            <i class="layui-icon layui-icon-auz"></i>
+            <input class="layui-input" id="kaptcha" placeholder="请输入验证码" autocomplete="off" lay-verType="tips" lay-verify="required" required/>
+            <img class="login-captcha" src="${ctxPath}/kaptcha" alt=""/>
+        </div>
+        @}
+<!--        <div class="layui-form-item">-->
+<!--            <input type="checkbox" name="remember" title="记住密码" lay-skin="primary" checked>-->
+<!--            <a href="javascript:;" class="layui-link pull-right">注册账号</a>-->
+<!--        </div>-->
+        <div class="layui-form-item">
+            <button class="layui-btn layui-btn-fluid" id="submit" >登录</button>
+        </div>
+    </div>
+</div>
+<div class="login-copyright"></div>
+<style>
+    body {
+        background-image: url("${ctxPath}/assets/common/images/bg-login1.png");
+        background-repeat: no-repeat;
+        background-size: 100%;
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+    }
+
+    /*body:before {*/
+    /*    content: "";*/
+    /*    background-color: rgba(0, 0, 0, .2);*/
+    /*    position: fixed;*/
+    /*    top: 0;*/
+    /*    left: 0;*/
+    /*    right: 0;*/
+    /*    bottom: 0;*/
+    /*}*/
+    .titles{
+        max-width: 850px;
+        height: 110px;
+    }
+    .titles img{
+        float: left;
+        margin-right: 24px;
+    }
+    .titles h1{
+        color: #fff;
+        font-size: 40px;
+        font-weight: 600;
+        /* margin-left: 24px; */
+        line-height: 68px;
+        letter-spacing: 12px;
+    }
+    .login-wrapper {
+        max-width: 900px;
+        padding: 20px;
+        margin: 0 auto;
+        position: relative;
+        box-sizing: border-box;
+        z-index: 2;
+    }
+
+    .login-wrapper > .layui-form {
+        max-width: 560px;
+        height: 500px;
+        padding: 25px 30px;
+        background-color: #fff;
+        box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.19);
+        box-sizing: border-box;
+        border-radius: 30px;
+        margin: 0 auto;
+    }
+
+    .login-wrapper > .layui-form > h2 {
+        color: #333;
+        font-size: 28px;
+        text-align: center;
+        margin-top: 60px;
+        margin-bottom: 54px;
+    }
+
+    .login-wrapper > .layui-form > .layui-form-item {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .login-wrapper > .layui-form > .layui-form-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .login-wrapper > .layui-form > .layui-form-item > .layui-input {
+        height: 58px;
+        line-height: 58px;
+        margin-bottom: 40px;
+        border-radius: 16px !important;
+    }
+
+    .login-wrapper .layui-input-icon-group > .layui-input {
+        padding-left: 46px;
+    }
+
+    .login-wrapper .layui-input-icon-group > .layui-icon {
+        width: 46px;
+        height: 58px;
+        line-height: 58px;
+        font-size: 20px;
+        color: #909399;
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        text-align: center;
+    }
+    .layui-icon-username1{
+        background-image: url("/assets/common/images/user.png");
+        background-size: 35%;
+        background-repeat: no-repeat;
+    }
+    .layui-icon-password1{
+        background-image: url("/assets/common/images/password.png");
+        background-size: 35%;
+        background-repeat: no-repeat;
+    }
+    .login-wrapper > .layui-form > .layui-form-item.login-captcha-group {
+        padding-right: 135px;
+    }
+
+    .login-wrapper > .layui-form > .layui-form-item.login-captcha-group > .login-captcha {
+        height: 46px;
+        width: 120px;
+        cursor: pointer;
+        box-sizing: border-box;
+        border: 1px solid #e6e6e6;
+        border-radius: 2px !important;
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .login-wrapper > .layui-form > .layui-form-item > .layui-form-checkbox {
+        margin: 0 !important;
+        padding-left: 25px;
+    }
+
+    .login-wrapper > .layui-form > .layui-form-item > .layui-form-checkbox > .layui-icon {
+        width: 15px !important;
+        height: 15px !important;
+    }
+
+    .login-wrapper > .layui-form .layui-btn-fluid {
+        height: 58px;
+        line-height: 58px;
+        font-size: 16px;
+        margin-top: 1px;
+        border-radius: 16px !important;
+    }
+
+    .login-wrapper > .layui-form > .layui-form-item.login-oauth-group > a > .layui-icon {
+        font-size: 26px;
+    }
+
+    .login-copyright {
+        color: #eee;
+        padding-bottom: 20px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    \@media screen and (min-height: 550px) {
+        .login-wrapper {
+            margin: -250px auto 0;
+            position: absolute;
+            top: 40%;
+            left: 0;
+            right: 0;
+            width: 100%;
+        }
+
+        .login-copyright {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+    }
+
+    .layui-btn {
+        background-color: #3A5CDE;
+        border-color: #3A5CDE;
+    }
+
+    .layui-link {
+        color: #5FB878 !important;
+    }
+</style>
+
+@/* 加入contextPath属性和session超时的配置 */
+<script type="text/javascript">
+    var Feng = {
+        ctxPath: "${ctxPath}",
+        version: '${constants.getReleaseVersion()}'
+    };
+</script>
+
+<!-- js部分 -->
+<script type="text/javascript" src="${ctxPath}/assets/common/libs/layui/layui.js?v=${constants.getReleaseVersion()}"></script>
+<script type="text/javascript" src="${ctxPath}/assets/common/js/common.js?v=${constants.getReleaseVersion()}"></script>
+<script>
+    layui.use(['layer', 'form', 'index', 'ax', 'notice'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var form = layui.form;
+        var $ax = layui.ax;
+        var index = layui.index;
+        var notice = layui.notice;
+
+        /* 图形验证码 */
+        $('img.login-captcha').click(function () {
+            this.src = this.src + '?t=' + (new Date).getTime();
+        });
+
+        var errorMsg = "${tips!}";
+        if (errorMsg) {
+            layer.msg(errorMsg, {icon: 5, anim: 6});
+        }
+
+        @if(constants.getTenantOpen()){
+            //初始化租户列表
+            var ajax = new $ax(Feng.ctxPath + "/tenantInfo/listTenants", function (data) {
+                for (var i = 0; i < data.data.length; i++) {
+                    var name = data.data[i].name;
+                    var code = data.data[i].code;
+                    $("#tenantCode").append('<option value="' + code + '">' + name + '</option>');
+                }
+                form.render();
+            }, function (data) {
+            });
+            ajax.start();
+        @}
+
+        //登录操作
+        $('#submit').click(function () {
+            var ajax = new $ax(Feng.ctxPath + "/login", function (data) {
+                Feng.success("登录成功!");
+                index.clearTabCache();
+                window.location.href = Feng.ctxPath + "/";
+            }, function (data) {
+                layer.msg("登录失败！" + data.responseJSON.message, {icon: 5, anim: 6});
+            });
+            ajax.set("username", $("#username").val());
+            ajax.set("password", $("#password").val());
+            @if(constants.getTenantOpen()){
+                ajax.set("tenantCode", $("#tenantCode").val());
+            @}
+            @if(constants.getKaptchaOpen()){
+                ajax.set("kaptcha", $("#kaptcha").val());
+            @}
+            ajax.start();
+        });
+
+
+
+        document.onkeydown=keyDownSearch;
+
+        function keyDownSearch(e) {
+
+            console.log("嘿嘿")
+            // 兼容FF和IE和Opera
+            var theEvent = e || window.event;
+            var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+            if (code == 13) {
+                $('#submit').trigger('click');
+                return false;
+            }
+            return true;
+        }
+
+
+
+    });
+</script>
+
+
+</body>
+</html>

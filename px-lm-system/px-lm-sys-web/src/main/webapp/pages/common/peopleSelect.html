@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>用户选择器</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+    <link rel="stylesheet" href="${ctxPath}/assets/common/libs/layui/css/layui.css?v=${constants.getReleaseVersion()}"/>
+    <link href="${ctxPath}/assets/expand/plugins/ztree/zTreeStyle.css?v=${constants.getReleaseVersion()}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="${ctxPath}/assets/expand/plugins/peopleSelect/peopleSelect.css">
+
+</head>
+<body>
+<!--选人弹窗 开始-->
+<div class="sp_select_popup_box h-108">
+    <!--选人 弹窗部分-->
+    <div class="sp_select_popup p-10">
+        <div class="w-200 b-gray1 pull-left sp_select_popup_left mt-10">
+            <div class="sp_select_popup_left_tab">
+                <!-- <a class="active">全部</a> -->
+                <a class="active">按部门</a>
+                <a>按角色</a>
+            </div>
+            <div class="pull-left sp_select_popup_left_tree">
+                <ul id="deptTree" class="ztree ztree-demo"></ul>
+                <ul id="roleTree" class="ztree ztree-demo"></ul>
+            </div>
+        </div>
+        <div class="pull-left sp_select_popup_con">
+            <div class="layui-row sp_select_popup_con_top pt-10 pb-5">
+                <form class="layui-form">
+					<div class="layui-col-xs10">
+					    <input class="layui-input" name="name" lay-verify="keyword" autocomplete="off" placeholder="输入关键字:姓名/身份证查询">
+					</div>
+					<div class="layui-col-xs2">
+					    <button class="layui-btn pull-right" lay-submit="" id="skeySubmit" lay-filter="skeySubmit"><i class="layui-icon layui-icon-search"></i>查询</button>
+					</div>
+				</form>
+            </div>
+            <table class="layui-table" id="ztreedata" lay-filter="test" lay-data="{id: 'idTest'}"></table>
+        </div>
+        <div class="w-200 pull-left sp_select_popup_right">
+            <h4>已选择:</h4>
+            <div class="sp_select_popup_right_list b-gray1">
+                <div class="sp_select_popup_right_list_box"></div>
+                <div class="sp_select_popup_right_list_bot">
+                    <a class="fsize-12 fcolor-99 delete">删除全部</a>
+                </div>
+            </div>
+            <div class="sp_select_popup_bot text-center">
+                <button class="layui-btn layui-btn-normal sp_select_popup_sub w-120">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="clear"></div>
+
+<!--选人弹窗 结束-->
+<input type="hidden" id="noId"/>
+<input type="hidden" id="no"/>
+<input type="hidden" id="nameId"/>
+<input type="hidden" id="name"/>
+</body>
+
+<!--其他插件js-->
+
+@/* 加入contextPath属性和session超时的配置 */
+<script type="text/javascript">
+    var Feng = {
+        ctxPath: "${ctxPath}",
+        version: '${constants.getReleaseVersion()}'
+    };
+</script>
+<script type="text/javascript" src="${ctxPath}/assets/common/libs/layui/layui.js?v=${constants.getReleaseVersion()}"></script>
+<script type="text/javascript" src="${ctxPath}/assets/common/js/common.js?v=${constants.getReleaseVersion()}"></script>
+<script type="text/javascript" src="${ctxPath}/assets/expand/plugins/jquery/jquery-3.2.1.min.js?v=${constants.getReleaseVersion()}"></script>
+<script type="text/javascript" src="${ctxPath}/assets/expand/plugins/ztree/jquery.ztree.all.min.js?v=${constants.getReleaseVersion()}"></script>
+<script type="text/javascript" src="${ctxPath}/assets/expand/plugins/peopleSelect/peopleSelect.js"></script>
+
+
+<script type="text/html" id="imgAvatar">
+	<img src="{{d.avatar}}" width="20" height="20" />
+</script>
+
+</html>

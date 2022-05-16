@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.doubleReport.mapper.UnitMapper">
+
+    <resultMap type="cn.px.sys.modular.doubleReport.entity.UnitEntity" id="UnitMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="belongingCommunity" column="belonging_community" jdbcType="INTEGER"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="contactPerson" column="contact_person" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="integral" column="integral" jdbcType="INTEGER"/>
+        <result property="isUnit" column="is_unit" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectUnitVo">
+        select id, enable, create_by as "createBy", create_time as "createTime", update_by as "updateBy", update_time as "updateTime", remark, sort, name, belonging_community as "belongingCommunity", address, contact_person as "contactPerson", phone, integral,user_id as "userId",is_unit as "isUnit" from unit
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM unit
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name = #{cm.name}
+            </if>
+            <if test="cm.belongingCommunity != null">
+                and belonging_community = #{cm.belongingCommunity}
+            </if>
+            <if test="cm.address != null and cm.address != ''">
+                and address = #{cm.address}
+            </if>
+            <if test="cm.contactPerson != null and cm.contactPerson != ''">
+                and contact_person = #{cm.contactPerson}
+            </if>
+            <if test="cm.phone != null and cm.phone != ''">
+                and phone = #{cm.phone}
+            </if>
+            <if test="cm.integral != null">
+                and integral = #{cm.integral}
+            </if>
+            <if test="cm.isUnit != null">
+                and is_unit = #{isUnit}
+            </if>
+        </where>
+    </select>
+
+    <select id="getUnitEntityByCommunity" resultType="cn.px.sys.modular.doubleReport.entity.UnitEntity">
+        select id,name,belonging_community as "belongingCommunity" from unit
+        <where>
+            enable = 1
+            <if test="belongingCommunity != null">
+                and belonging_community = #{belongingCommunity}
+            </if>
+        </where>
+    </select>
+
+    <select id="getList" resultType="map">
+        select u.id, u.create_time as "createTime", u.name, u.belonging_community as "belongingCommunity", u.address,
+         u.contact_person as "contactPerson", u.phone,u.user_id as "userId",ifnull(au.remaining_points,0) as "remainingPoints",u.is_unit
+        from unit u LEFT JOIN all_user au ON u.user_id = au.id
+         <where>
+             u.enable = 1
+             <if test="name != null and name != ''">
+                 and u.name like CONCAT('%',#{name},'%')
+             </if>
+             <if test="contactPerson != null and contactPerson != ''">
+                 and u.contact_person like CONCAT('%',#{contactPerson},'%')
+             </if>
+             <if test="cid != null">
+                 and u.belonging_community = #{cid}
+             </if>
+             <if test="belongingCommunity != null">
+                 and  belonging_community = #{belongingCommunity}
+             </if>
+             <if test="isUnit != null">
+                 and u.is_unit = #{isUnit}
+             </if>
+         </where>
+         ORDER BY au.remaining_points DESC
+    </select>
+    <select id="getUnitEntityByPhone" resultType="cn.px.sys.modular.doubleReport.entity.UnitEntity">
+        select id,name,phone,belonging_community as "belongingCommunity" from unit where enable = 1 and is_unit = 2 and phone = #{phone}
+    </select>
+
+    <select id="getUnitEntityByUserId" resultType="cn.px.sys.modular.doubleReport.entity.UnitEntity">
+        <include refid="selectUnitVo"/> where enable = 1 and user_id = #{userId} and is_unit = 2
+    </select>
+
+    <select id="getIntegral" resultType="cn.px.sys.modular.doubleReport.vo.UnitListVo">
+        select ifnull(sum(au.remaining_points),0) as "remainingPoints" from unit u LEFT JOIN all_user au ON u.user_id = au.id
+        where u.enable = 1 and u.is_unit=2 and u.belonging_community = #{cid}
+    </select>
+
+    <select id="getIntegral1" resultType="cn.px.sys.modular.doubleReport.vo.UnitListVo">
+        select ifnull(sum(au.remaining_points),0) as "remainingPoints" from unit u LEFT JOIN all_user au ON u.user_id = au.id
+        <where>
+            u.enable = 1 and au.type = 3 and u.is_unit = 2
+              and  u.user_id = #{userId}
+        </where>
+    </select>
+
+    <select id="getList1" resultType="cn.px.sys.modular.doubleReport.entity.UnitEntity">
+        <include refid="selectUnitVo"/>
+
+         <where>
+             enable = 1 and is_unit=2
+         </where>
+    </select>
+
+    <select id="countByPhone" resultType="int">
+        select count(1) from unit where enable = 1 and is_unit=2 and  phone = #{phone}
+    </select>
+
+    <select id="getUnitEntityByCommunity1" resultType="cn.px.sys.modular.doubleReport.entity.UnitEntity">
+        select id,name,belonging_community as "belongingCommunity" from unit
+        <where>
+            enable = 1 and is_unit = 1
+            <if test="belongingCommunity != null">
+                and belonging_community = #{belongingCommunity}
+            </if>
+        </where>
+    </select>
+</mapper>

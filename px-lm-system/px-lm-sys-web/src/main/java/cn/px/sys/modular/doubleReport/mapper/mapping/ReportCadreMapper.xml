@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.doubleReport.mapper.ReportCadreMapper">
+
+    <resultMap type="cn.px.sys.modular.doubleReport.entity.ReportCadreEntity" id="ReportCadreMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="belongingCommunity" column="belonging_community" jdbcType="INTEGER"/>
+        <result property="belongingHome" column="belonging_home" jdbcType="INTEGER"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="belongingUnit" column="belonging_unit" jdbcType="INTEGER"/>
+        <result property="numbering" column="numbering" jdbcType="VARCHAR"/>
+        <result property="avatar" column="avatar" jdbcType="OTHER"/>
+        <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="integral" column="integral" jdbcType="INTEGER"/>
+        <result property="idNumber" column="id_number" jdbcType="VARCHAR"/>
+        <result property="isBind" column="is_bind" jdbcType="INTEGER"/>
+        <result property="openid" column="openid" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="selectReportCadreVo">
+        select id, enable, create_by as "createBy", create_time as "createTime", update_by as "updateBy", update_time as "updateTime", remark, sort, name, belonging_community as "belongingCommunity", belonging_home as "belongingHome", address, belonging_unit as "belongingUnit", numbering, avatar, nickname, phone, integral, id_number as "idNumber", is_bind as "isBind", openid,user_id as "userId",expertise from report_cadre
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM report_cadre
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name like CONCAT('%',#{cm.name},'%')
+            </if>
+            <if test="cm.belongingCommunity != null">
+                and belonging_community = #{cm.belongingCommunity}
+            </if>
+            <if test="cm.belongingHome != null">
+                and belonging_home = #{cm.belongingHome}
+            </if>
+            <if test="cm.address != null and cm.address != ''">
+                and address = #{cm.address}
+            </if>
+            <if test="cm.belongingUnit != null">
+                and belonging_unit = #{cm.belongingUnit}
+            </if>
+            <if test="cm.numbering != null and cm.numbering != ''">
+                and numbering = #{cm.numbering}
+            </if>
+            <if test="cm.avatar != null">
+                and avatar = #{cm.avatar}
+            </if>
+            <if test="cm.nickname != null and cm.nickname != ''">
+                and nickname = #{cm.nickname}
+            </if>
+            <if test="cm.phone != null and cm.phone != ''">
+                and phone like CONCAT('%',#{cm.phone},'%')
+            </if>
+            <if test="cm.integral != null">
+                and integral = #{cm.integral}
+            </if>
+            <if test="cm.idNumber != null and cm.idNumber != ''">
+                and idNumber like CONCAT('%',#{cm.idNumber},'%')
+            </if>
+            <if test="cm.isBind != null">
+                and is_bind = #{cm.isBind}
+            </if>
+            <if test="cm.openid != null and cm.openid != ''">
+                and openid = #{cm.openid}
+            </if>
+        </where>
+    </select>
+
+    <select id="getReportCadreEntityByPhone" resultType="cn.px.sys.modular.doubleReport.entity.ReportCadreEntity">
+        select id,phone from report_cadre where enable = 1 and phone = #{phone}
+    </select>
+
+    <select id="getReportCadreEntityByUserId" resultType="cn.px.sys.modular.doubleReport.entity.ReportCadreEntity">
+        <include refid="selectReportCadreVo"/> where enable = 1 and user_id = #{userId}
+    </select>
+
+    <select id="getListHome" resultType="map">
+          select rc.id,rc.name,
+          rc.belonging_community as "belongingCommunity", rc.belonging_home as "belongingHome", rc.address, rc.belonging_unit as "belongingUnit",
+          rc.phone, rc.id_number as "idNumber", rc.is_bind as "isBind",rc.user_id as "userId",au.avatar,au.nickname,au.integral,au.remaining_points as "remainingPoints" from report_cadre rc
+          LEFT JOIN all_user au ON rc.user_id = au.id
+          <where>
+              rc.enable = 1
+              <if test="name != null and name != ''">
+                and  rc.name  like CONCAT('%',#{name},'%')
+              </if>
+              <if test="phone != null and phone != ''">
+                and  rc.phone = #{phone}
+              </if>
+              <if test="cid != null">
+               and rc.belonging_community =#{cid}
+              </if>
+              <if test="belongingCommunity != null">
+                  and rc.belonging_community =#{belongingCommunity}
+              </if>
+              <if test="belongingUnit != null">
+                  and rc.belonging_unit =#{belongingUnit}
+              </if>
+              <if test="expertise != null">
+                  and rc.expertise =#{expertise}
+              </if>
+          </where>
+          ORDER BY au.remaining_points DESC
+    </select>
+    <select id="exportListData" resultType="map">
+        select rc.id,rc.name,rc.phone,au.integral,cc.name as "communityName", u.name as "unitName", hc.name as "homeName", rc.id_number as "idNumber"
+        from report_cadre rc
+        left join all_user au on rc.user_id = au.id
+        left join community_class cc on rc.belonging_community = cc.id
+        left join unit u on rc.belonging_unit = u.id
+        left join home_class hc on rc.belonging_home = hc.id
+        <where>
+            rc.enable = 1
+            <if test="name != null and name != ''">
+                and  rc.name  like CONCAT('%',#{name},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and  rc.phone = #{phone}
+            </if>
+            <if test="cid != null and cid != ''">
+                and rc.id_number like CONCAT('%',#{cid},'%')
+            </if>
+        </where>
+        ORDER BY rc.update_time DESC
+    </select>
+
+    <select id="getIntegral" resultType="cn.px.sys.modular.doubleReport.vo.ReportCadreVo">
+        select  ifnull(sum(au.remaining_points),0) as "remainingPoints" from report_cadre rc LEFT JOIN all_user au on rc.user_id = au.id
+        where rc.enable = 1 and rc.belonging_community = #{cid}
+    </select>
+
+    <select id="getIntegral1" resultType="cn.px.sys.modular.doubleReport.vo.ReportCadreVo">
+        select  ifnull(sum(au.remaining_points),0) as "remainingPoints" from report_cadre rc LEFT JOIN all_user au on rc.user_id = au.id
+        where rc.enable = 1 and rc.belonging_unit = #{uid}
+    </select>
+
+
+    <select id="getListByUnitId" resultType="Map">
+        select rc.id,rc.name,
+        rc.belonging_community as "belongingCommunity",
+        rc.belonging_home as "belongingHome", rc.address,
+         rc.belonging_unit as "belongingUnit",
+        rc.phone, rc.id_number as "idNumber",
+        rc.is_bind as "isBind",rc.user_id as "userId",au.avatar,au.nickname,
+        au.integral,au.remaining_points as "remainingPoints" from report_cadre rc
+         LEFT JOIN all_user au ON rc.user_id = au.id
+        <where>
+            <if test="id !=null and id != '' ">
+                and rc.belonging_unit = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and rc.name like CONCAT('%',#{name},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and rc.phone like CONCAT('%',#{phone},'%')
+            </if>
+            and rc.enable = 1
+        </where>
+        order by au.remaining_points desc
+    </select>
+
+    <select id="countByPhone" resultType="int">
+        select count(1) from report_cadre where phone = #{phone} and enable = 1
+    </select>
+
+
+    <select id="getReportCadreEntityByunit" resultType="cn.px.sys.modular.doubleReport.entity.ReportCadreEntity">
+        select id,phone from report_cadre where enable = 1 and belonging_unit = #{unit}
+    </select>
+</mapper>

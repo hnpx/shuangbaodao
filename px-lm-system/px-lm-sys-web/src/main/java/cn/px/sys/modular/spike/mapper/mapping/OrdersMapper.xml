@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.spike.mapper.OrdersMapper">
+
+    <resultMap type="cn.px.sys.modular.spike.entity.OrdersEntity" id="OrdersMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="numbering" column="numbering" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="productId" column="product_id" jdbcType="INTEGER"/>
+        <result property="number" column="number" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectOrdersVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, numbering, user_id, product_id, number, status from orders
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM orders
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.numbering != null and cm.numbering != ''">
+                and numbering = #{cm.numbering}
+            </if>
+            <if test="cm.userId != null">
+                and user_id = #{cm.userId}
+            </if>
+            <if test="cm.productId != null">
+                and product_id = #{cm.productId}
+            </if>
+            <if test="cm.number != null">
+                and number = #{cm.number}
+            </if>
+            <if test="cm.status != null">
+                and status = #{cm.status}
+            </if>
+        </where>
+    </select>
+
+    <select id="getHomeList" resultType="map">
+       select o.id, o.create_time as "createTime", o.user_id as "userId", o.product_id as "productId", o.number, o.status ,au.nickname,p.name as  "productName",au.phone,p.head_figure as "headFigure"
+       from orders o LEFT JOIN all_user au ON o.user_id =  au.id LEFT JOIN product p ON p.id =  o.product_id
+       <where>
+           <if test="nickname != null and nickname != ''">
+               au.nickname like  CONCAT('%',#{nickname},'%')
+           </if>
+           <if test="productName != null and productName != ''">
+               p.name like  CONCAT('%',#{productName},'%')
+           </if>
+           <if test="status != null and status != ''">
+               o.status = #{status}
+           </if>
+       </where>
+       ORDER BY o.create_time DESC
+
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1) from orders where product_id = #{productId} and user_id = #{userId} and create_time BETWEEN  #{startTime} and  #{endTime}
+    </select>
+</mapper>

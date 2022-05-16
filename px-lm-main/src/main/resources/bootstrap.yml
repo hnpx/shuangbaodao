@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: px-lm-manage
+  profiles:
+    active: ${spring.active:dev}
+
+    
+management:
+  endpoints:
+    web:
+      base-path: /ops
+      exposure:
+        include: '*'

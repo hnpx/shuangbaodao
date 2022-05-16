@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.activity.mapper.ActivityUserSignMapper">
+
+    <resultMap type="cn.px.sys.modular.activity.entity.ActivityUserSignEntity" id="ActivityUserSignMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="activityId" column="activity_id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectActivityUserSignVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, activity_id, user_id, status from activity_user_sign
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM activity_user_sign
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.activityId != null">
+                and activity_id = #{cm.activityId}
+            </if>
+            <if test="cm.userId != null">
+                and user_id = #{cm.userId}
+            </if>
+            <if test="cm.status != null">
+                and status = #{cm.status}
+            </if>
+        </where>
+    </select>
+    <select id="getListByUserId" resultType="map">
+        select aus.id,aus.activity_id as "activityId",aus.user_id as "userId",aus.status,a.user_type as "userType",a.name,
+         a.integral,a.start_time as "startTime",a.end_time as "endTime",a.address,a.contact_person as "contactPerson",a.phone,a.headFigure
+         from activity_user_sign aus LEFT JOIN activity a ON aus.activity_id = a.id
+        <where>
+            aus.enable = 1 and user_id = #{userId}
+            <if test="status == 1">
+                and #{date}  between a.start_time and a.end_time
+            </if>
+             <if test="status == 2">
+                 and #{date} &gt; a.end_time
+             </if>
+        </where>
+          ORDER BY aus.update_time DESC
+    </select>
+
+    <select id="getListSignByUserId" resultType="map">
+        select aus.id,
+        aus.activity_id as "activityId",
+        aus.user_id as "userId",au.id,
+        au.nickname,au.avatar,
+        DATE_FORMAT(aus.create_time,'%Y-%m-%d') as "createTime",
+        aus.status from activity_user_sign aus LEFT JOIN all_user au ON aus.user_id = au.id
+        where  aus.activity_id = #{activeId} ORDER BY aus.update_time DESC
+    </select>
+
+    <select id="getListSignBy" resultType="cn.px.sys.modular.activity.vo.UserVo">
+        select aus.id,aus.activity_id as "activityId",aus.user_id as "userId",au.id,au.nickname,au.avatar,DATE_FORMAT(aus.create_time,'%Y-%m-%d') as "createTime" from activity_user_sign aus LEFT JOIN all_user au ON aus.user_id = au.id
+        where  aus.activity_id = #{activeId} ORDER BY aus.update_time DESC limit 0,3
+    </select>
+
+    <select id="getCount" resultType="int">
+
+    </select>
+
+    <select id="getListSignByAid" resultType="cn.px.sys.modular.activity.entity.ActivityUserSignEntity">
+     select user_id,status from activity_user_sign where activity_id = #{activeId}
+    </select>
+
+    <select id="getEntityByUser" resultType="cn.px.sys.modular.activity.entity.ActivityUserSignEntity">
+        <include refid="selectActivityUserSignVo"/>
+        where user_id = #{userId}
+    </select>
+</mapper>

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.project.mapper.ProjectUserSignMapper">
+
+    <resultMap type="cn.px.sys.modular.project.entity.ProjectUserSignEntity" id="ProjectUserSignMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="projectId" column="project_id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="picture" column="picture" jdbcType="VARCHAR"/>
+        <result property="certificationStatus" column="certification_status" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectProjectUserSignVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, project_id, user_id, status,picture,certification_status as certificationStatus from project_user_sign
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM project_user_sign
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.projectId != null">
+                and project_id = #{cm.projectId}
+            </if>
+            <if test="cm.userId != null">
+                and user_id = #{cm.userId}
+            </if>
+            <if test="cm.status != null">
+                and status = #{cm.status}
+            </if>
+            <if test="cm.picture != null">
+                and picture = #{cm.picture}
+            </if>
+            <if test="cm.certificationStatus != null">
+                and certification_status = #{cm.certificationStatus}
+            </if>
+        </where>
+    </select>
+
+    <select id="getProjectUserSignEntityList" resultType="cn.px.sys.modular.project.entity.ProjectUserSignEntity">
+        select id,project_id as "projectId",user_id as "userId" ,picture from project_user_sign where enable = 1 and project_id = #{projectId}
+    </select>
+
+    <select id="getUserVo" resultType="cn.px.sys.modular.activity.vo.UserVo">
+        select pus.id,pus.project_id as "projectId",pus.user_id as "userId",au.nickname,au.avatar,DATE_FORMAT(pus.create_time,'%Y-%m-%d') as "createTime" from project_user_sign pus LEFT JOIN all_user au ON au.id = pus.user_id
+        where pus.enable = 1 and pus.project_id = #{projectId} ORDER BY pus.update_time DESC limit 0,3
+    </select>
+
+    <select id="getPageList" resultType="map">
+
+        select pus.id,
+        pus.project_id as "projectId",
+        pus.user_id as "userId",
+        pus.picture,
+        pus.certification_status,
+        au.nickname,
+        au.avatar,
+        DATE_FORMAT(pus.create_time,'%Y-%m-%d') as "createTime",
+        pus.status,
+        m.name as "realName",
+        au.phone as "phone",
+        u.name as "unitName"
+        from project_user_sign pus LEFT JOIN all_user au ON au.id = pus.user_id
+        LEFT JOIN member m ON m.user_id = au.id
+        LEFT JOIN unit u ON m.belonging_unit = u.id
+       <where>
+           pus.enable = 1 and pus.project_id = #{projectId} and au.type = 1
+           <if test="unit != null and unit != ''">
+               and u.name like CONCAT('%',#{unit},'%')
+           </if>
+           <if test="name != null and name != ''">
+               and m.name like CONCAT('%',#{name},'%')
+           </if>
+           <if test="phone != null and phone != ''">
+               and au.phone like CONCAT('%',#{phone},'%')
+           </if>
+           <if test="photo == 1">
+               and  pus.picture is null
+           </if>
+           <if test="photo == 2">
+               and  pus.picture is not null
+           </if>
+           <if test="type == 1">
+               and pus.certification_status = 1
+           </if>
+           <if test="type == 2">
+               and pus.certification_status = 2
+           </if>
+       </where>
+        UNION ALL
+        select pus.id,
+        pus.project_id as "projectId",
+        pus.user_id as "userId",
+        pus.picture,
+        pus.certification_status,
+        au.nickname,
+        au.avatar,
+        DATE_FORMAT(pus.create_time,'%Y-%m-%d') as "createTime",
+        pus.status,
+        rc.name as "realName",
+        au.phone as "phone",
+        u.name as "unitName"
+        from project_user_sign pus LEFT JOIN all_user au ON au.id = pus.user_id
+        LEFT JOIN report_cadre rc ON rc.user_id = au.id
+        LEFT JOIN unit u ON rc.belonging_unit = u.id
+        <where>
+            pus.enable = 1 and pus.project_id = #{projectId} and au.type = 2
+            <if test="unit != null and unit != ''">
+                and u.name like CONCAT('%',#{unit},'%')
+            </if>
+            <if test="name != null and name != ''">
+                and rc.name like CONCAT('%',#{name},'%')
+            </if>
+            <if test="phone != null and phone != ''">
+                and au.phone like CONCAT('%',#{phone},'%')
+            </if>
+            <if test="photo == 1">
+                and  pus.picture is null
+            </if>
+            <if test="photo == 2">
+                and  pus.picture is not null
+            </if>
+            <if test="type == 1">
+                and pus.certification_status = 1
+            </if>
+            <if test="type == 2">
+                and pus.certification_status = 2
+            </if>
+        </where>
+
+        UNION ALL
+
+        select pus.id,
+        pus.project_id as "projectId",
+        pus.user_id as "userId",
+        pus.picture,
+        pus.certification_status,
+        au.nickname,
+        au.avatar,
+        DATE_FORMAT(pus.create_time,'%Y-%m-%d') as "createTime",
+        pus.status ,u.name as "realName",au.phone,u.name as "unitName"
+        from project_user_sign pus LEFT JOIN all_user au ON au.id = pus.user_id
+        LEFT JOIN unit u ON u.user_id = pus.user_id
+          <where>
+              pus.enable = 1 and pus.project_id = #{projectId} and au.type = 3
+              <if test="unit != null and unit != ''">
+                  and u.name like CONCAT('%',#{unit},'%')
+              </if>
+              <if test="name != null and name != ''">
+                  and u.name like CONCAT('%',#{name},'%')
+              </if>
+              <if test="phone != null and phone != ''">
+                  and au.phone  like CONCAT('%',#{phone},'%')
+              </if>
+              <if test="photo == 1">
+                  and  pus.picture is null
+              </if>
+              <if test="photo == 2">
+                  and  pus.picture is not null
+              </if>
+              <if test="type == 1">
+                  and pus.certification_status = 1
+              </if>
+              <if test="type == 2">
+                  and pus.certification_status = 2
+              </if>
+          </where>
+
+    </select>
+
+    <select id="getPageList1" resultType="map">
+          select pus.id,
+          pus.project_id as "projectId",
+          pus.user_id as "userId",
+          au.nickname,au.avatar,
+          DATE_FORMAT(pus.create_time,'%Y-%m-%d') as "createTime",
+          pus.status from project_user_sign pus LEFT JOIN all_user au ON au.id = pus.user_id
+          LEFT JOIN report_cadre rc ON rc.id = pus.user_id
+          <where>
+              pus.enable = 1 and pus.project_id = #{projectId}
+             <if test="unit != null and unit != ''">
+                 and rc.belonging_unit = #{unit}
+             </if>
+             <if test="name != null and name != ''">
+                 and rc.name like CONCAT('%',#{name},'%')
+             </if>
+             <if test="phone != null and phone != ''">
+                 and au.phone = #{phone}
+             </if>
+          </where>
+
+        ORDER BY pus.create_time DESC
+    </select>
+
+    <select id="getListByUserId" resultType="map">
+        select pus.id,pus.project_id as "projectId", pus.user_id as "userId", pus.status,p.name,p.head_figure as "headFigure",
+         p.address,p.start_time as "startTime",p.end_time as "endTime",p.contact_person as "contactPerson",p.phone,p.personnel_type as "personnelType"
+         from project_user_sign pus LEFT JOIN project p
+        ON p.id = pus.project_id
+
+        <where>
+            pus.enable = 1 and pus.user_id = #{userId}
+            <if test="status == 1">
+                and #{date}  between p.start_time and p.end_time
+            </if>
+            <if test="status == 2">
+                and #{date} &gt; p.end_time
+            </if>
+        </where>
+        ORDER BY pus.update_time DESC
+    </select>
+
+    <select id="getProjectEntityByPid" resultType="cn.px.sys.modular.project.entity.ProjectUserSignEntity">
+        select * from project_user_sign where enable = 1 and project_id = #{pid}
+    </select>
+
+    <select id="getPerformance" resultType="map">
+        select pus.id,pus.create_time as "createTime",pus.project_id as "projectId", pus.user_id as "userId", pus.status,p.start_time as "startTime",p.end_time as "endTime",p.name as "projectName",
+        p.integral,p.reportPoints,p.enable,p.address,p.service_time as "serviceTime",p.integral
+        from project_user_sign pus
+        LEFT JOIN project p ON p.id = pus.project_id
+        <where>
+            pus.enable !=0   and pus.user_id = #{userId}
+            <if test="projectName != null and projectName != ''">
+              and  p.name  like CONCAT('%',#{projectName},'%')
+            </if>
+            <if test="pid != null">
+                and p.id = #{pid}
+            </if>
+            <if test="year != null">
+                and pus.create_time  like CONCAT('%',#{year},'%')
+
+            </if>
+        </where>
+        ORDER BY pus.update_time desc
+    </select>
+
+
+    <update id="updateEnbale">
+        update project_user_sign set enable = 1
+        where user_id = #{userId} and project_id = #{projectId}
+    </update>
+    
+    <select id="getEntityByUser" resultType="cn.px.sys.modular.project.entity.ProjectUserSignEntity">
+        <include refid="selectProjectUserSignVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <select id="getEntityByPid" resultType="cn.px.sys.modular.project.entity.ProjectUserSignEntity">
+        <include refid="selectProjectUserSignVo"/>
+        where project_id = #{pid} and picture is not null
+    </select>
+
+    <select id="getProjectUserSignEntityByPid" resultType="cn.px.sys.modular.project.entity.ProjectUserSignEntity">
+        <include refid="selectProjectUserSignVo"/>
+        where project_id = #{pid} and picture is  null and certification_status = 1
+    </select>
+</mapper>

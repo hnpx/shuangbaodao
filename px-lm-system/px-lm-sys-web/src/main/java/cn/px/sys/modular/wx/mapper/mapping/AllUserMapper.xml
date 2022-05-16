@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.wx.mapper.AllUserMapper">
+
+    <resultMap type="cn.px.sys.modular.wx.entity.AllUserEntity" id="AllUserMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="avatar" column="avatar" jdbcType="OTHER"/>
+        <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+        <result property="openid" column="openid" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectAllUserVo">
+        select id, enable, create_by as "createBy", create_time as "createTime", update_by as "updateBy", update_time as "updateTime", remark, sort, address, avatar, nickname, openid, phone, type,integral,status,points_consumption as "pointsConsumption",remaining_points as "remainingPoints" from all_user
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM all_user
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.address != null and cm.address != ''">
+                and address = #{cm.address}
+            </if>
+            <if test="cm.avatar != null">
+                and avatar = #{cm.avatar}
+            </if>
+            <if test="cm.nickname != null and cm.nickname != ''">
+                and nickname = #{cm.nickname}
+            </if>
+            <if test="cm.openid != null and cm.openid != ''">
+                and openid = #{cm.openid}
+            </if>
+            <if test="cm.phone != null and cm.phone != ''">
+                and phone = #{cm.phone}
+            </if>
+            <if test="cm.type != null">
+                and type = #{cm.type}
+            </if>
+        </where>
+    </select>
+
+    <select id="readByOpenid" resultType="cn.px.sys.modular.wx.entity.AllUserEntity">
+       <include refid="selectAllUserVo"/>
+        where enable = 1 and openid = #{openid}
+    </select>
+
+    <select id="getAllUserEntityByType" resultType="map">
+        select au.id, au.address, au.avatar, au.nickname, au.openid, au.phone, au.type,au.integral,au.status,au.points_consumption as "pointsConsumption",au.remaining_points,IFNULL(SUM(iw.Integral),0) as "remainingPoints" from all_user au
+        LEFT JOIN integral_water iw ON iw.user_id = au.id
+        where au.enable = 1 and au.type = 2 and au.status = 2
+         GROUP BY iw.user_id
+        ORDER BY SUM(iw.Integral) DESC
+    </select>
+
+    <select id="getAllUserEntityByType2" resultType="map">
+        select au.id, au.address, au.avatar, au.nickname, au.openid, au.phone, au.type,au.integral,au.status,au.points_consumption as "pointsConsumption",au.remaining_points ,IFNULL(SUM(iw.Integral),0) as "remainingPoints" from all_user au left JOIN report_cadre rc
+        ON au.id = rc.user_id LEFT JOIN integral_water iw ON iw.user_id = au.id
+        where au.enable = 1 and au.type = 2 and rc.belonging_unit = #{unit} and au.status = 2
+         GROUP BY iw.user_id
+        ORDER BY SUM(iw.Integral) DESC
+    </select>
+
+    <select id="getAllUserEntityByType1" resultType="cn.px.sys.modular.wx.entity.AllUserEntity">
+        select id, address, avatar, nickname, openid, phone, type,integral,status,points_consumption as "pointsConsumption",remaining_points as "remainingPoints" from all_user
+        where enable = 1 and type = 2
+    </select>
+
+    <select id="getListUser" resultType="map">
+            SELECT au.id as "userId",au.avatar,au.nickname,au.type,au.phone FROM all_user au LEFT JOIN unit u ON u.user_id = au.id
+       <where>
+           au.type is NOT null
+            <if test="userType==2">
+                and au.type = 2
+            </if>
+           <if test="userType==3">
+               and au.type = 3
+               and u.id = #{uid}
+           </if>
+           <if test="userIds != null and userIds != ''">
+               and au.id not IN (${userIds})
+
+           </if>
+           <if test="nickname != null and nickname != ''">
+               and au.nickname like CONCAT('%',#{nickname},'%')
+           </if>
+
+       </where>
+    </select>
+
+    <select id="getListUser1" resultType="map">
+        SELECT a.userId,a.avatar,a.nickname,a.type,a.phone,a.name,u.name as "unitName" from (
+
+        SELECT au.id as "userId",au.avatar,au.nickname,au.type,au.phone,m.name,m.id as "mid",m.belonging_unit as "belongingUnit" from all_user au LEFT JOIN member m ON au.id = m.user_id)
+        a LEFT JOIN unit u ON u.id = a.belongingUnit
+        <where>
+           <if test="userType==1">
+            and  a.type = 1
+           </if>
+           <if test="userType != 1">
+               and  a.type = 0
+           </if>
+
+            <if test="name != null and name != ''">
+               and u.name like CONCAT('%',#{name},'%')
+            </if>
+            <if test="userIds != null and userIds != '' ">
+                and a.userId not IN (${userIds})
+            </if>
+            <if test="phone != null and phone != ''">
+                and a.phone like CONCAT('%',#{phone},'%')
+            </if>
+            <if test="unit != null and unit != ''">
+                and u.name like CONCAT('%',#{unit},'%')
+            </if>
+        </where>
+
+        UNION ALL
+
+        SELECT a.userId,a.avatar,a.nickname,a.type,a.phone,a.name,u.name as "unitName" from (
+
+        SELECT au.id as "userId",au.avatar,au.nickname,au.type,au.phone,m.name,m.id as "mid",m.belonging_unit as "belongingUnit" from all_user au LEFT JOIN report_cadre m ON au.id = m.user_id)
+        a LEFT JOIN unit u ON u.id = a.belongingUnit
+           <where>
+               <if test="userType==2 ">
+                   and  a.type = 2
+               </if>
+               <if test="userType==1">
+                   and  a.type = 2
+               </if>
+               <if test="userType == 3">
+                   and  a.type = 0
+               </if>
+               <if test="name != null and name != ''">
+                   and a.name like CONCAT('%',#{name},'%')
+               </if>
+               <if test="userIds != null and userIds != '' ">
+                   and a.userId not IN (${userIds})
+               </if>
+               <if test="phone != null and phone != ''">
+                   and a.phone like CONCAT('%',#{phone},'%')
+               </if>
+               <if test="unit != null and unit != ''">
+                   and u.name like CONCAT('%',#{unit},'%')
+               </if>
+           </where>
+
+        UNION ALL
+
+        SELECT au.id as "userId",au.avatar,au.nickname,au.type,au.phone,m.contact_person as "name",m.name as "unitName" from all_user au LEFT JOIN unit m ON m.user_id = au.id
+        <where>
+            <if test="userType==3">
+                and  au.type = 3
+            </if>
+            <if test="userType==1">
+                and  au.type = 3
+            </if>
+            <if test="userType == 2">
+                and  au.type = 0
+            </if>
+            <if test="name != null and name != ''">
+                and m.contact_person like CONCAT('%',#{name},'%')
+            </if>
+            <if test="userIds != null and userIds != '' ">
+                and au.id not IN (${userIds})
+            </if>
+            <if test="phone != null and phone != ''">
+                and au.phone like CONCAT('%',#{phone},'%')
+            </if>
+            <if test="unit != null and unit != ''">
+                and m.name like CONCAT('%',#{unit},'%')
+            </if>
+        </where>
+
+
+    </select>
+
+    <select id="getUserIds" resultType="cn.px.sys.modular.wx.entity.AllUserEntity">
+        SELECT au.id FROM all_user au LEFT JOIN activity_user_sign aus ON au.id = aus.user_id where
+          aus.activity_id = #{activeId}
+    </select>
+
+    <select id="getUserIds1" resultType="cn.px.sys.modular.wx.entity.AllUserEntity">
+        SELECT au.id FROM all_user au LEFT JOIN project_user_sign pus ON au.id = pus.user_id where
+          pus.project_id = #{pid}
+    </select>
+
+
+    <update id="updatePoints">
+        update all_user
+         set integral = integral + #{integral},
+         remaining_points = remaining_points + #{integral}
+         where  id = #{id}
+    </update>
+
+    <select id="getAllUserEntityById" resultType="cn.px.sys.modular.wx.entity.AllUserEntity">
+       <include refid="selectAllUserVo"/>
+       where id = #{id}
+    </select>
+
+</mapper>

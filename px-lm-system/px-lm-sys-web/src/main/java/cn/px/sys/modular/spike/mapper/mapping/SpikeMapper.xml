@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.spike.mapper.SpikeMapper">
+
+    <resultMap type="cn.px.sys.modular.spike.entity.SpikeEntity" id="SpikeMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="productId" column="product_id" jdbcType="INTEGER"/>
+        <result property="stratTime" column="strat_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="number" column="number" jdbcType="INTEGER"/>
+        <result property="limitNumber" column="limit_number" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectSpikeVo">
+        select id, enable, create_by as "createBy", create_time as "createTime", update_by as "updateBy", update_time as "updateTime", remark, sort, product_id as "productId", strat_time as "stratTime", end_time as "endTime", price, number, limit_number as "limitNumber",redeemed_ampunt as "redeemedAmpunt",number_people_exchanged as "numberPeopleExchanged" from spike
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM spike
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.productId != null">
+                and product_id = #{cm.productId}
+            </if>
+            <if test="cm.stratTime != null">
+                and strat_time = #{cm.stratTime}
+            </if>
+            <if test="cm.endTime != null">
+                and end_time = #{cm.endTime}
+            </if>
+            <if test="cm.price != null">
+                and price = #{cm.price}
+            </if>
+            <if test="cm.number != null">
+                and number = #{cm.number}
+            </if>
+            <if test="cm.limitNumber != null">
+                and limit_number = #{cm.limitNumber}
+            </if>
+        </where>
+    </select>
+
+
+
+
+
+<!--    查询限时秒杀-->
+    <select id="timeLimitedSecondKill" resultType="cn.px.sys.modular.spike.vo.SpikeQueryVO" >
+              SELECT
+                p.head_figure,
+                p.NAME as productName,
+                s.strat_time,
+                s.end_time,
+                s.number_people_exchanged,
+                s.price,
+                s.product_id,
+                s.number,
+				s.limit_number,
+				s.id
+            FROM
+                spike s
+                inner JOIN product p ON s.product_id = p.id
+
+            <where>
+                s.`enable` =1 and NOW() &lt;= s.end_time
+            </where>
+
+    </select>
+
+
+    <!--    查询限时秒杀-->
+    <select id="timeLimitedSecondKill1" resultType="cn.px.sys.modular.spike.vo.SpikeQueryVO" >
+        SELECT
+        p.head_figure,
+        p.NAME as productName,
+        s.strat_time,
+        s.end_time,
+        s.number_people_exchanged,
+        s.price,
+        s.product_id,
+        s.number,
+        s.limit_number,
+        s.id
+        FROM
+        spike s
+        inner JOIN product p ON s.product_id = p.id
+
+        <where>
+            s.`enable` =1 and NOW() &lt;= s.end_time
+
+            <if test="name != null and name != ''">
+                and s.name  like CONCAT('%',#{name},'%')
+            </if>
+            <if test="timeStatus == 1">
+                and  NOW() &lt;= s.strat_time
+            </if>
+            <if test="timeStatus == 2">
+                and   NOW() &gt;= s.strat_time
+                and NOW() &lt;= s.end_time
+            </if>
+            <if test="timeStatus == 3">
+                and  NOW() &gt;= s.end_time
+            </if>
+        </where>
+
+    </select>
+<!--    查询秒杀活动详情-->
+    <select id="getSeckillActivityDetails" resultType="cn.px.sys.modular.spike.vo.SeckillActivityDetailsVO">
+            SELECT
+                p.head_figure,
+                p.NAME AS productName,
+                s.strat_time,
+                s.end_time,
+                s.redeemed_ampunt,
+                s.price,
+                s.number,
+                s.exchange_notice as "exchangeNotice"
+            FROM
+                spike s
+                INNER JOIN product p ON s.product_id = p.id
+            WHERE
+                s.`enable` =1 and s.product_id=#{productId}
+    </select>
+
+ <!--   根据商品id查询是否为秒杀活动-->
+    <select id="getSpikeEntityByPid" resultType="cn.px.sys.modular.spike.entity.SpikeEntity">
+       <include refid="selectSpikeVo"/>  where enable = 1 and product_id = #{pid}
+    </select>
+
+    <select id="check" resultType="cn.px.sys.modular.spike.entity.SpikeEntity">
+          <include refid="selectSpikeVo"/>
+          where NOW() &gt; end_time and product_id = #{pid} and enable = 1
+    </select>
+
+    <select id="check1" resultType="cn.px.sys.modular.spike.entity.SpikeEntity">
+          <include refid="selectSpikeVo"/>
+          where NOW() &lt; end_time and product_id = #{pid} and enable = 1
+    </select>
+</mapper>

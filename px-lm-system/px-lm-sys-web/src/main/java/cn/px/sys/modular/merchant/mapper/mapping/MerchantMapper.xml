@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.merchant.mapper.MerchantMapper">
+
+    <resultMap type="cn.px.sys.modular.merchant.entity.MerchantEntity" id="MerchantMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="contactPerson" column="contact_person" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="introduction" column="introduction" jdbcType="VARCHAR"/>
+        <result property="headFigure" column="head_figure" jdbcType="VARCHAR"/>
+        <result property="classificationId" column="classification_id" jdbcType="INTEGER"/>
+        <result property="belongingCommunity" column="belonging_community" jdbcType="INTEGER"/>
+        <result property="belongingHome" column="belonging_home" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="selectMerchantVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, name, address, contact_person, phone, introduction, head_figure, classification_id, belonging_community, belonging_home from merchant
+    </sql>
+
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM merchant
+        <where>
+            enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.name != null and cm.name != ''">
+                and name  like CONCAT('%',#{cm.name},'%')
+            </if>
+            <if test="cm.address != null and cm.address != ''">
+                and address = #{cm.address}
+            </if>
+            <if test="cm.contactPerson != null and cm.contactPerson != ''">
+                and contact_person = #{cm.contactPerson}
+            </if>
+            <if test="cm.phone != null and cm.phone != ''">
+                and phone = #{cm.phone}
+            </if>
+            <if test="cm.introduction != null and cm.introduction != ''">
+                and introduction = #{cm.introduction}
+            </if>
+            <if test="cm.headFigure != null and cm.headFigure != ''">
+                and head_figure = #{cm.headFigure}
+            </if>
+            <if test="cm.classificationId != null">
+                and classification_id = #{cm.classificationId}
+            </if>
+            <if test="cm.belongingCommunity != null">
+                and belonging_community = #{cm.belongingCommunity}
+            </if>
+            <if test="cm.belongingHome != null">
+                and belonging_home = #{cm.belongingHome}
+            </if>
+        </where>
+        ORDER BY update_time DESC
+    </select>
+
+    <select id="getListPage" resultType="map">
+    select id, name,head_figure as "headFigure",address,contact_person as "contactPerson",phone,introduction,user_id as "userId" from merchant
+     <where>
+         enable = 1
+         <if test="classification != null">
+             and classification_id = #{classification}
+         </if>
+         <if test="name != null and name != ''">
+             and name  like CONCAT('%',#{name},'%')
+         </if>
+         <if test="status != null and status != ''">
+             and status = #{status}
+         </if>
+         <if test="contactPerson != null and contactPerson != ''">
+             and contact_person  like CONCAT('%',#{contactPerson},'%')
+         </if>
+         <if test="phone != null and phone != ''">
+             and phone  like CONCAT('%',#{phone},'%')
+         </if>
+    </where>
+    </select>
+
+
+    <select id="getListPage1" resultType="map">
+        select id, name,head_figure as "headFigure",address,contact_person as "contactPerson",phone,introduction,user_id as "userId" from merchant
+        <where>
+            enable = 1  and status = 1
+            <if test="classification != null">
+                and classification_id = #{classification}
+            </if>
+            <if test="name != null and name != ''">
+                and name  like CONCAT('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getMerchantEntityByUserId" resultType="cn.px.sys.modular.merchant.entity.MerchantEntity">
+        select id,status from merchant where enable = 1 and user_id = #{userId} and  status = 1
+    </select>
+
+    <select id="getById" resultType="cn.px.sys.modular.merchant.entity.MerchantEntity">
+        <include refid="selectMerchantVo"/>
+         where enable = 1 and id = #{id}
+    </select>
+</mapper>

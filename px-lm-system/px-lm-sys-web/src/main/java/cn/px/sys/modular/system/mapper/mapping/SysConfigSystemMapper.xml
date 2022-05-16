@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.px.sys.modular.system.mapper.SysConfigSystemMapper">
+
+    <resultMap type="cn.px.sys.modular.system.entity.SysConfigSystemEntity" id="SysConfigSystemMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="enable" column="enable" jdbcType="INTEGER"/>
+        <result property="createBy" column="create_by" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateBy" column="update_by" jdbcType="INTEGER"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="remark" column="remark" jdbcType="OTHER"/>
+        <result property="sort" column="sort" jdbcType="INTEGER"/>
+        <result property="sysName" column="sys_name" jdbcType="VARCHAR"/>
+        <result property="sysCode" column="sys_code" jdbcType="VARCHAR"/>
+        <result property="sysAbbreviation" column="sys_abbreviation" jdbcType="VARCHAR"/>
+        <result property="sysLogo" column="sys_logo" jdbcType="VARCHAR"/>
+        <result property="sysUrl" column="sys_url" jdbcType="VARCHAR"/>
+        <result property="whiteList" column="white_list" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <sql id="selectSysConfigSystemVo">
+        select id, enable, create_by, create_time, update_by, update_time, remark, sort, sys_name, sys_code, sys_abbreviation, sys_logo, sys_url, white_list from sys_config_system
+    </sql>
+    
+    <select id="selectIdPage" resultType="java.lang.Long">
+        SELECT id FROM  sys_config_system
+        <where>
+                enable = 1
+            <if test="cm.id != null">
+                and id = #{cm.id}
+            </if>
+            <if test="cm.enable != null">
+                and enable = #{cm.enable}
+            </if>
+            <if test="cm.createBy != null">
+                and create_by = #{cm.createBy}
+            </if>
+            <if test="cm.createTime != null">
+                and create_time = #{cm.createTime}
+            </if>
+            <if test="cm.updateBy != null">
+                and update_by = #{cm.updateBy}
+            </if>
+            <if test="cm.updateTime != null">
+                and update_time = #{cm.updateTime}
+            </if>
+            <if test="cm.remark != null">
+                and remark = #{cm.remark}
+            </if>
+            <if test="cm.sort != null">
+                and sort = #{cm.sort}
+            </if>
+            <if test="cm.sysName != null and cm.sysName != ''">
+                and sys_name = #{cm.sysName}
+            </if>
+            <if test="cm.sysCode != null and cm.sysCode != ''">
+                and sys_code = #{cm.sysCode}
+            </if>
+            <if test="cm.sysAbbreviation != null and cm.sysAbbreviation != ''">
+                and sys_abbreviation = #{cm.sysAbbreviation}
+            </if>
+            <if test="cm.sysLogo != null and cm.sysLogo != ''">
+                and sys_logo = #{cm.sysLogo}
+            </if>
+            <if test="cm.sysUrl != null and cm.sysUrl != ''">
+                and sys_url = #{cm.sysUrl}
+            </if>
+            <if test="cm.whiteList != null and cm.whiteList != ''">
+                and white_list = #{cm.whiteList}
+            </if>
+        </where>
+    </select>
+</mapper>
